@@ -1,5 +1,5 @@
 {
-	"name": "DS_TMP_DIM_BMW_MODELS",
+	"name": "DS_DIM_BMW_MODELS",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "LNK_SQL_SERVER_TRG",
@@ -10,7 +10,7 @@
 		"schema": [],
 		"typeProperties": {
 			"schema": "BMW",
-			"table": "TMP_DIM_BMW_MODEL"
+			"table": "DIM_BMW_MODEL"
 		}
 	}
 }

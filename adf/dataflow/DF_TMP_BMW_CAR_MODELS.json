@@ -15,7 +15,7 @@
 			"sinks": [
 				{
 					"dataset": {
-						"referenceName": "DS_DIM_BMW_MODELS",
+						"referenceName": "DS_TMP_DIM_BMW_MODELS",
 						"type": "DatasetReference"
 					},
 					"name": "sink1"
