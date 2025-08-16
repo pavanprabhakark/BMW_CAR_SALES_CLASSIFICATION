@@ -30,6 +30,9 @@
 				},
 				{
 					"name": "surrogateKeyDIMCARMODELS"
+				},
+				{
+					"name": "derivedColumnDIMCARSMODEL"
 				}
 			],
 			"scriptLines": [
@@ -61,7 +64,8 @@
 				"AGGDIMCARSALESMODEL keyGenerate(output(BMW_ID as long),",
 				"     startAt: 1L,",
 				"     stepValue: 1L) ~> surrogateKeyDIMCARMODELS",
-				"surrogateKeyDIMCARMODELS sink(allowSchemaDrift: true,",
+				"surrogateKeyDIMCARMODELS derive(LAST_MOdified_date = currentDate('PST')) ~> derivedColumnDIMCARSMODEL",
+				"derivedColumnDIMCARSMODEL sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     deletable:false,",
 				"     insertable:true,",
@@ -74,7 +78,8 @@
 				"     mapColumn(",
 				"          ID = BMW_ID,",
 				"          BMW_Model = Model,",
-				"          BMW_ENGINE_SIZE = Engine_Size",
+				"          BMW_ENGINE_SIZE = Engine_Size,",
+				"          LAST_Modified_date = LAST_MOdified_date",
 				"     )) ~> SINKDIMCARSALESMODEL"
 			]
 		}
