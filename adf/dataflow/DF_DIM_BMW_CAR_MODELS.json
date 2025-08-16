@@ -6,7 +6,7 @@
 			"sources": [
 				{
 					"dataset": {
-						"referenceName": "DS_SRC_DIM_BMW_CAR_MODELS",
+						"referenceName": "DS_SRC_TMP_BMW_CAR_MODELS",
 						"type": "DatasetReference"
 					},
 					"name": "SRCDIMBMWCARMODELS"
