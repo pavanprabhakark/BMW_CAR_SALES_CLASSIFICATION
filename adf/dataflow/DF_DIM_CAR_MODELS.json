@@ -1,0 +1,70 @@
+{
+	"name": "DF_DIM_CAR_MODELS",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "DS_SRC_BMW_CAR_SALES",
+						"type": "DatasetReference"
+					},
+					"name": "DIMCARMODELS"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "DS_TRG_BMW_CAR_SALES",
+						"type": "DatasetReference"
+					},
+					"name": "SINKDIMCARSALESMODEL"
+				}
+			],
+			"transformations": [
+				{
+					"name": "SELECTDIMCARSALESMODELS"
+				},
+				{
+					"name": "AGGDIMCARSALESMODEL"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          Model as string,",
+				"          Year as string,",
+				"          Region as string,",
+				"          Color as string,",
+				"          Fuel_Type as string,",
+				"          Transmission as string,",
+				"          Engine_Size_L as string,",
+				"          Mileage_KM as string,",
+				"          Price_USD as string,",
+				"          Sales_Volume as string,",
+				"          Sales_Classification as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> DIMCARMODELS",
+				"DIMCARMODELS select(mapColumn(",
+				"          Model,",
+				"          Engine_Size = Engine_Size_L",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> SELECTDIMCARSALESMODELS",
+				"SELECTDIMCARSALESMODELS aggregate(groupBy(Model),",
+				"     Model_Count = count(Model)) ~> AGGDIMCARSALESMODEL",
+				"AGGDIMCARSALESMODEL sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> SINKDIMCARSALESMODEL"
+			]
+		}
+	}
+}
