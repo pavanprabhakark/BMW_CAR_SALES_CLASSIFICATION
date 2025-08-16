@@ -16,7 +16,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"dataflow": {
-						"referenceName": "DF_BMW_CAR_MODELS",
+						"referenceName": "DF_TMP_BMW_CAR_MODELS",
 						"type": "DataFlowReference"
 					},
 					"compute": {

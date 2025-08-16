@@ -15,7 +15,7 @@
 			"sinks": [
 				{
 					"dataset": {
-						"referenceName": "DS_TRG_TMP_BMW_CAR_SALES",
+						"referenceName": "DS_TRG_BMW_CAR_SALES",
 						"type": "DatasetReference"
 					},
 					"name": "SINKDIMCARSALESMODEL"
