@@ -27,6 +27,9 @@
 				},
 				{
 					"name": "AGGDIMCARSALESMODEL"
+				},
+				{
+					"name": "surrogateKeyDIMCARMODELS"
 				}
 			],
 			"scriptLines": [
@@ -55,7 +58,10 @@
 				"SELECTDIMCARSALESMODELS aggregate(groupBy(Model,",
 				"          Engine_Size),",
 				"     Model_Count = count(Model)) ~> AGGDIMCARSALESMODEL",
-				"AGGDIMCARSALESMODEL sink(allowSchemaDrift: true,",
+				"AGGDIMCARSALESMODEL keyGenerate(output(BMW_ID as long),",
+				"     startAt: 1L,",
+				"     stepValue: 1L) ~> surrogateKeyDIMCARMODELS",
+				"surrogateKeyDIMCARMODELS sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     deletable:false,",
 				"     insertable:true,",
