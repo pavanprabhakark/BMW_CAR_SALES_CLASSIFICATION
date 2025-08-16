@@ -70,12 +70,7 @@
 				"     format: 'table',",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true,",
-				"     errorHandlingOption: 'stopOnFirstError',",
-				"     mapColumn(",
-				"          ID = BMW_ID,",
-				"          BMW_Model = Model,",
-				"          BMW_ENGINE_SIZE = Engine_Size",
-				"     )) ~> SINKDIMCARSALESMODEL"
+				"     errorHandlingOption: 'stopOnFirstError') ~> SINKDIMCARSALESMODEL"
 			]
 		}
 	}
