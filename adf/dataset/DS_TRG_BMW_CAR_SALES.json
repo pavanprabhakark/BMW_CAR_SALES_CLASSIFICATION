@@ -1,0 +1,16 @@
+{
+	"name": "DS_TRG_BMW_CAR_SALES",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LNK_SQL_SERVER_TRG",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "BMW",
+			"table": "BMW_Sales_Classification"
+		}
+	}
+}
