@@ -1,0 +1,9 @@
+{
+	"name": "BMWCARSALESClassification",
+	"location": "eastus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "41a0287a-fff4-468d-856e-375184af668b",
+		"tenantId": "b8993f9c-e1d9-4bfe-b8c6-7acc1e194d2f"
+	}
+}
