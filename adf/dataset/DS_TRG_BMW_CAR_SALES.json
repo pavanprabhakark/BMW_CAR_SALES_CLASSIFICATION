@@ -10,7 +10,7 @@
 		"schema": [],
 		"typeProperties": {
 			"schema": "BMW",
-			"table": "DIM_CAR_MODELS"
+			"table": "TMP_DIM_BMW_MODEL"
 		}
 	}
 }
