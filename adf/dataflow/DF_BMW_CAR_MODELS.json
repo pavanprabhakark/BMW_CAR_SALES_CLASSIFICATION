@@ -1,0 +1,46 @@
+{
+	"name": "DF_BMW_CAR_MODELS",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "DS_SRC_BMW_CAR_SALES",
+						"type": "DatasetReference"
+					},
+					"name": "DIMCARMODEL"
+				}
+			],
+			"sinks": [],
+			"transformations": [
+				{
+					"name": "selectDIMBMWCARMODELS"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          Model as string,",
+				"          Year as string,",
+				"          Region as string,",
+				"          Color as string,",
+				"          Fuel_Type as string,",
+				"          Transmission as string,",
+				"          Engine_Size_L as string,",
+				"          Mileage_KM as string,",
+				"          Price_USD as string,",
+				"          Sales_Volume as string,",
+				"          Sales_Classification as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> DIMCARMODEL",
+				"DIMCARMODEL select(mapColumn(",
+				"          Model",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> selectDIMBMWCARMODELS"
+			]
+		}
+	}
+}
