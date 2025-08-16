@@ -5,14 +5,20 @@
 		"typeProperties": {
 			"sources": [
 				{
-					"name": "source1"
+					"dataset": {
+						"referenceName": "DS_SRC_DIM_BMW_CAR_MODELS",
+						"type": "DatasetReference"
+					},
+					"name": "SRCDIMBMWCARMODELS"
 				}
 			],
 			"sinks": [],
 			"transformations": [],
 			"scriptLines": [
 				"source(allowSchemaDrift: true,",
-				"     validateSchema: false) ~> source1"
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> SRCDIMBMWCARMODELS"
 			]
 		}
 	}
