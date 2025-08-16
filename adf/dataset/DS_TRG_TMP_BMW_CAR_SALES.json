@@ -1,5 +1,5 @@
 {
-	"name": "DS_TRG_BMW_CAR_SALES",
+	"name": "DS_TRG_TMP_BMW_CAR_SALES",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "LNK_SQL_SERVER_TRG",
