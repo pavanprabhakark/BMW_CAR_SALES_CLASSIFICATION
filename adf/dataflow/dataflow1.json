@@ -1,0 +1,78 @@
+{
+	"name": "dataflow1",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "DS_SRC_DIM_BMW_MODEL",
+						"type": "DatasetReference"
+					},
+					"name": "SRCDIMBMWCARMODELS"
+				},
+				{
+					"dataset": {
+						"referenceName": "DS_SRC_TMP_DIM_BMW_MODEL",
+						"type": "DatasetReference"
+					},
+					"name": "SRCDIMTMPCARMODELS"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "DS_DIM_BMW_MODELS",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "exists1"
+				},
+				{
+					"name": "select1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          BMW_ID as long,",
+				"          Model as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> SRCDIMBMWCARMODELS",
+				"source(output(",
+				"          BMW_ID as long,",
+				"          Model as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> SRCDIMTMPCARMODELS",
+				"SRCDIMTMPCARMODELS, SRCDIMBMWCARMODELS exists(SRCDIMTMPCARMODELS@Model == SRCDIMBMWCARMODELS@Model,",
+				"     negate:true,",
+				"     broadcast: 'auto')~> exists1",
+				"exists1 select(mapColumn(",
+				"          BMW_ID,",
+				"          Model",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"select1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> sink1"
+			]
+		}
+	}
+}

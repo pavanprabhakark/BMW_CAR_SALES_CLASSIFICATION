@@ -1,0 +1,16 @@
+{
+	"name": "DS_TMP_DIM_BMW_MODELS",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LNK_SQL_SERVER_TRG",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "BMW",
+			"table": "TMP_DIM_BMW_MODEL"
+		}
+	}
+}

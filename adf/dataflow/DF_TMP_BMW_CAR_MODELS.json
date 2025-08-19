@@ -1,0 +1,79 @@
+{
+	"name": "DF_TMP_BMW_CAR_MODELS",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "DS_SRC_BMW_CAR_SALES",
+						"type": "DatasetReference"
+					},
+					"name": "DIMCARMODEL"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "DS_TMP_DIM_BMW_MODELS",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "selectDIMBMWCARMODELS"
+				},
+				{
+					"name": "aggregatedimcarmodels"
+				},
+				{
+					"name": "surrogateKey1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          Model as string,",
+				"          Year as string,",
+				"          Region as string,",
+				"          Color as string,",
+				"          Fuel_Type as string,",
+				"          Transmission as string,",
+				"          Engine_Size_L as string,",
+				"          Mileage_KM as string,",
+				"          Price_USD as string,",
+				"          Sales_Volume as string,",
+				"          Sales_Classification as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> DIMCARMODEL",
+				"DIMCARMODEL select(mapColumn(",
+				"          Model",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> selectDIMBMWCARMODELS",
+				"selectDIMBMWCARMODELS aggregate(groupBy(Model),",
+				"     Model_Count = count(Model)) ~> aggregatedimcarmodels",
+				"aggregatedimcarmodels keyGenerate(output(ID as long),",
+				"     startAt: 1L,",
+				"     stepValue: 1L) ~> surrogateKey1",
+				"surrogateKey1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          BMW_ID = ID,",
+				"          Model",
+				"     )) ~> sink1"
+			]
+		}
+	}
+}
