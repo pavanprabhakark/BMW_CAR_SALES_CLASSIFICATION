@@ -1,0 +1,29 @@
+{
+	"name": "DF_EXIST_TRANSFORM",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "SRC_TEST_SQL",
+						"type": "DatasetReference"
+					},
+					"name": "SRCTEST"
+				}
+			],
+			"sinks": [],
+			"transformations": [],
+			"scriptLines": [
+				"source(output(",
+				"          BMW_ID as long,",
+				"          Model as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> SRCTEST"
+			]
+		}
+	}
+}
