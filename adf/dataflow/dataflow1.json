@@ -13,7 +13,7 @@
 				},
 				{
 					"dataset": {
-						"referenceName": "DS_SRC_TMP_BMW_CAR_MODELS",
+						"referenceName": "DS_SRC_TMP_DIM_BMW_MODEL",
 						"type": "DatasetReference"
 					},
 					"name": "SRCDIMTMPCARMODELS"
@@ -22,7 +22,7 @@
 			"sinks": [],
 			"transformations": [
 				{
-					"name": "InnerJoin"
+					"name": "Existtransform"
 				}
 			],
 			"scriptLines": [
@@ -34,15 +34,17 @@
 				"     validateSchema: false,",
 				"     isolationLevel: 'READ_UNCOMMITTED',",
 				"     format: 'table') ~> SRCDIMBMWCARMODELS",
-				"source(allowSchemaDrift: true,",
+				"source(output(",
+				"          BMW_ID as long,",
+				"          Model as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     isolationLevel: 'READ_UNCOMMITTED',",
 				"     format: 'table') ~> SRCDIMTMPCARMODELS",
-				"SRCDIMBMWCARMODELS join(ERROR_FUNCTION('') == ERROR_FUNCTION(''),",
-				"     joinType:'inner',",
-				"     matchType:'exact',",
-				"     ignoreSpaces: false,",
-				"     broadcast: 'auto')~> InnerJoin"
+				"SRCDIMBMWCARMODELS, SRCDIMTMPCARMODELS exists(SRCDIMBMWCARMODELS@Model == SRCDIMTMPCARMODELS@Model,",
+				"     negate:true,",
+				"     broadcast: 'auto')~> Existtransform"
 			]
 		}
 	}
