@@ -1,0 +1,26 @@
+{
+	"name": "SRC_TEST_SQL",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LNK_SQL_SERVER_TRG",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "BMW_ID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "Model",
+				"type": "nvarchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "BMW",
+			"table": "DIM_BMW_MODEL"
+		}
+	}
+}
