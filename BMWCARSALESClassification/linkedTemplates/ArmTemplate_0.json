@@ -1,0 +1,734 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "BMWCARSALESClassification"
+		},
+		"LNK_SRC_BMW_CAR_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'LNK_SRC_BMW_CAR'"
+		},
+		"AzureKeyVault1_properties_typeProperties_baseUrl": {
+			"type": "string",
+			"defaultValue": "https://mykeyvaults01.vault.azure.net/"
+		},
+		"LNK_SQL_SERVER_TRG_properties_typeProperties_connectionString_secretName": {
+			"type": "string",
+			"defaultValue": "BMWCARSales"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureKeyVault1')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureKeyVault",
+				"typeProperties": {
+					"baseUrl": "[parameters('AzureKeyVault1_properties_typeProperties_baseUrl')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/LNK_SRC_BMW_CAR')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobStorage",
+				"typeProperties": {
+					"connectionString": "[parameters('LNK_SRC_BMW_CAR_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_BLOB_GET_METADATA_BMW_CARS')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LNK_SRC_BMW_CAR",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "BMW_Car_Sales_Classification.csv",
+						"container": "srccon1"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "Model",
+						"type": "String"
+					},
+					{
+						"name": "Year",
+						"type": "String"
+					},
+					{
+						"name": "Region",
+						"type": "String"
+					},
+					{
+						"name": "Color",
+						"type": "String"
+					},
+					{
+						"name": "Fuel_Type",
+						"type": "String"
+					},
+					{
+						"name": "Transmission",
+						"type": "String"
+					},
+					{
+						"name": "Engine_Size_L",
+						"type": "String"
+					},
+					{
+						"name": "Mileage_KM",
+						"type": "String"
+					},
+					{
+						"name": "Price_USD",
+						"type": "String"
+					},
+					{
+						"name": "Sales_Volume",
+						"type": "String"
+					},
+					{
+						"name": "Sales_Classification",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LNK_SRC_BMW_CAR')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_SRC_BMW_CAR_SALES')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LNK_SRC_BMW_CAR",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "BMW_Car_Sales_Classification.csv",
+						"container": "srccon1"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "Model",
+						"type": "String"
+					},
+					{
+						"name": "Year",
+						"type": "String"
+					},
+					{
+						"name": "Region",
+						"type": "String"
+					},
+					{
+						"name": "Color",
+						"type": "String"
+					},
+					{
+						"name": "Fuel_Type",
+						"type": "String"
+					},
+					{
+						"name": "Transmission",
+						"type": "String"
+					},
+					{
+						"name": "Engine_Size_L",
+						"type": "String"
+					},
+					{
+						"name": "Mileage_KM",
+						"type": "String"
+					},
+					{
+						"name": "Price_USD",
+						"type": "String"
+					},
+					{
+						"name": "Sales_Volume",
+						"type": "String"
+					},
+					{
+						"name": "Sales_Classification",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LNK_SRC_BMW_CAR')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/LNK_SQL_SERVER_TRG')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"connectionString": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "AzureKeyVault1",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": "[parameters('LNK_SQL_SERVER_TRG_properties_typeProperties_connectionString_secretName')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureKeyVault1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_DIM_BMW_MODELS')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LNK_SQL_SERVER_TRG",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "BMW",
+					"table": "DIM_BMW_MODEL"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LNK_SQL_SERVER_TRG')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_SRC_DIM_BMW_MODEL')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LNK_SQL_SERVER_TRG",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "BMW_ID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "Model",
+						"type": "nvarchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "BMW",
+					"table": "DIM_BMW_MODEL"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LNK_SQL_SERVER_TRG')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_SRC_TMP_DIM_BMW_MODEL')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LNK_SQL_SERVER_TRG",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "BMW_ID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "Model",
+						"type": "nvarchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "BMW",
+					"table": "TMP_DIM_BMW_MODEL"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LNK_SQL_SERVER_TRG')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_TMP_DIM_BMW_MODELS')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LNK_SQL_SERVER_TRG",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "BMW",
+					"table": "TMP_DIM_BMW_MODEL"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LNK_SQL_SERVER_TRG')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_TRG_BMW_CAR_SALES')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LNK_SQL_SERVER_TRG",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "BMW",
+					"table": "DIM_CAR_MODELS"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LNK_SQL_SERVER_TRG')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SRC_TEST_SQL')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LNK_SQL_SERVER_TRG",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "BMW_ID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "Model",
+						"type": "nvarchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "BMW",
+					"table": "DIM_BMW_MODEL"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LNK_SQL_SERVER_TRG')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DF_DIM_CAR_MODELS')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "DS_SRC_BMW_CAR_SALES",
+								"type": "DatasetReference"
+							},
+							"name": "DIMCARMODELS"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "DS_TRG_BMW_CAR_SALES",
+								"type": "DatasetReference"
+							},
+							"name": "SINKDIMCARSALESMODEL"
+						}
+					],
+					"transformations": [
+						{
+							"name": "SELECTDIMCARSALESMODELS"
+						},
+						{
+							"name": "AGGDIMCARSALESMODEL"
+						},
+						{
+							"name": "surrogateKeyDIMCARMODELS"
+						},
+						{
+							"name": "derivedColumnDIMCARSMODEL"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          Model as string,",
+						"          Year as string,",
+						"          Region as string,",
+						"          Color as string,",
+						"          Fuel_Type as string,",
+						"          Transmission as string,",
+						"          Engine_Size_L as string,",
+						"          Mileage_KM as string,",
+						"          Price_USD as string,",
+						"          Sales_Volume as string,",
+						"          Sales_Classification as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> DIMCARMODELS",
+						"DIMCARMODELS select(mapColumn(",
+						"          Model,",
+						"          Engine_Size = Engine_Size_L",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> SELECTDIMCARSALESMODELS",
+						"SELECTDIMCARSALESMODELS aggregate(groupBy(Model,",
+						"          Engine_Size),",
+						"     Model_Count = count(Model)) ~> AGGDIMCARSALESMODEL",
+						"AGGDIMCARSALESMODEL keyGenerate(output(BMW_ID as long),",
+						"     startAt: 1L,",
+						"     stepValue: 1L) ~> surrogateKeyDIMCARMODELS",
+						"surrogateKeyDIMCARMODELS derive(LAST_MOdified_date = currentDate('PST')) ~> derivedColumnDIMCARSMODEL",
+						"derivedColumnDIMCARSMODEL sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError',",
+						"     mapColumn(",
+						"          ID = BMW_ID,",
+						"          BMW_Model = Model,",
+						"          BMW_ENGINE_SIZE = Engine_Size,",
+						"          LAST_Modified_date = LAST_MOdified_date",
+						"     )) ~> SINKDIMCARSALESMODEL"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/DS_SRC_BMW_CAR_SALES')]",
+				"[concat(variables('factoryId'), '/datasets/DS_TRG_BMW_CAR_SALES')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DF_EXIST_TRNSFORMS')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "DS_SRC_DIM_BMW_MODEL",
+								"type": "DatasetReference"
+							},
+							"name": "SRCDIMBMWCARMODELS"
+						},
+						{
+							"dataset": {
+								"referenceName": "DS_SRC_TMP_DIM_BMW_MODEL",
+								"type": "DatasetReference"
+							},
+							"name": "SRCDIMTMPCARMODELS"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "DS_DIM_BMW_MODELS",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [
+						{
+							"name": "exists1"
+						},
+						{
+							"name": "select1"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          BMW_ID as long,",
+						"          Model as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> SRCDIMBMWCARMODELS",
+						"source(output(",
+						"          BMW_ID as long,",
+						"          Model as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> SRCDIMTMPCARMODELS",
+						"SRCDIMTMPCARMODELS, SRCDIMBMWCARMODELS exists(SRCDIMTMPCARMODELS@Model == SRCDIMBMWCARMODELS@Model,",
+						"     negate:true,",
+						"     broadcast: 'auto')~> exists1",
+						"exists1 select(mapColumn(",
+						"          BMW_ID,",
+						"          Model",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select1",
+						"select1 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError') ~> sink1"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/DS_SRC_DIM_BMW_MODEL')]",
+				"[concat(variables('factoryId'), '/datasets/DS_SRC_TMP_DIM_BMW_MODEL')]",
+				"[concat(variables('factoryId'), '/datasets/DS_DIM_BMW_MODELS')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DF_TMP_BMW_CAR_MODELS')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "DS_SRC_BMW_CAR_SALES",
+								"type": "DatasetReference"
+							},
+							"name": "DIMCARMODEL"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "DS_TMP_DIM_BMW_MODELS",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [
+						{
+							"name": "selectDIMBMWCARMODELS"
+						},
+						{
+							"name": "aggregatedimcarmodels"
+						},
+						{
+							"name": "surrogateKey1"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          Model as string,",
+						"          Year as string,",
+						"          Region as string,",
+						"          Color as string,",
+						"          Fuel_Type as string,",
+						"          Transmission as string,",
+						"          Engine_Size_L as string,",
+						"          Mileage_KM as string,",
+						"          Price_USD as string,",
+						"          Sales_Volume as string,",
+						"          Sales_Classification as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> DIMCARMODEL",
+						"DIMCARMODEL select(mapColumn(",
+						"          Model",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> selectDIMBMWCARMODELS",
+						"selectDIMBMWCARMODELS aggregate(groupBy(Model),",
+						"     Model_Count = count(Model)) ~> aggregatedimcarmodels",
+						"aggregatedimcarmodels keyGenerate(output(ID as long),",
+						"     startAt: 1L,",
+						"     stepValue: 1L) ~> surrogateKey1",
+						"surrogateKey1 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError',",
+						"     mapColumn(",
+						"          BMW_ID = ID,",
+						"          Model",
+						"     )) ~> sink1"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/DS_SRC_BMW_CAR_SALES')]",
+				"[concat(variables('factoryId'), '/datasets/DS_TMP_DIM_BMW_MODELS')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DF_PIPLINE_DM_CAR_MODEL')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "DF_DIM_CAR_MODEL",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "DF_DIM_CAR_MODELS",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"DIMCARMODELS": {},
+									"SINKDIMCARSALESMODEL": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/DF_DIM_CAR_MODELS')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/PIP_DIM_BMW_MODEL')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "DF_DIM_BMW_MODEL",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "DF_EXIST_TRNSFORMS",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"SRCDIMBMWCARMODELS": {},
+									"SRCDIMTMPCARMODELS": {},
+									"sink1": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/DF_EXIST_TRNSFORMS')]"
+			]
+		}
+	]
+}
