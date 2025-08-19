@@ -19,10 +19,21 @@
 					"name": "SRCDIMTMPCARMODELS"
 				}
 			],
-			"sinks": [],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "DS_DIM_BMW_MODELS",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
 			"transformations": [
 				{
-					"name": "Existtransform"
+					"name": "exists1"
+				},
+				{
+					"name": "select1"
 				}
 			],
 			"scriptLines": [
@@ -42,9 +53,25 @@
 				"     validateSchema: false,",
 				"     isolationLevel: 'READ_UNCOMMITTED',",
 				"     format: 'table') ~> SRCDIMTMPCARMODELS",
-				"SRCDIMBMWCARMODELS, SRCDIMTMPCARMODELS exists(SRCDIMBMWCARMODELS@Model == SRCDIMTMPCARMODELS@Model,",
+				"SRCDIMTMPCARMODELS, SRCDIMBMWCARMODELS exists(SRCDIMTMPCARMODELS@Model == SRCDIMBMWCARMODELS@Model,",
 				"     negate:true,",
-				"     broadcast: 'auto')~> Existtransform"
+				"     broadcast: 'auto')~> exists1",
+				"exists1 select(mapColumn(",
+				"          BMW_ID,",
+				"          Model",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"select1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> sink1"
 			]
 		}
 	}
